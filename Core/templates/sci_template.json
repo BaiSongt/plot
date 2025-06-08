@@ -1,0 +1,11 @@
+{
+  "axis": {
+    "labelFont": "Arial",
+    "labelPrecision": 2,
+    "gridVisible": true
+  },
+  "export": {
+    "dpi": 300,
+    "size": [210, 148] 
+  }
+}
