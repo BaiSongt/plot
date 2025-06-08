@@ -20,8 +20,9 @@ void DataModel::loadExcel(const QString &path) {
         emit dataLoaded(matrix);
     } catch (const std::exception &e) {
         qCritical() << "数据加载错误: " << e.what();
+        // Ensure matrix is cleared or not used if loading failed partially before error
+        // For simplicity, we assume matrix might be empty or partially filled, 
+        // but dataLoaded/dataParsed won't be emitted on error path.
         emit errorOccurred(tr("文件加载失败: %1").arg(e.what()));
     }
-    emit dataParsed(matrix);
-    emit dataLoaded(matrix);
 }

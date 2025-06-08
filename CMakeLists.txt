@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(DataVisualizer LANGUAGES CXX)
 
+# Set modern policy for FetchContent timestamp behavior
+cmake_policy(SET CMP0135 NEW)
+
 # 自动下载第三方库
 include(FetchContent)
 FetchContent_Declare(

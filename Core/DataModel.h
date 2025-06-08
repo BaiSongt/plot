@@ -10,4 +10,5 @@ public:
 signals:
     void dataParsed(const QVector<QVector<double>>& matrix);
     void dataLoaded(const QVector<QVector<double>>& matrix);
+    void errorOccurred(const QString &message);
 };

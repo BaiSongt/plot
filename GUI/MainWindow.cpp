@@ -1,16 +1,26 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h" // Generated from mainwindow.ui
-#include "Core/UndoRedoManager.h" // Assuming UndoRedoManager.h is in Core
-#include "qcustomplot.h"      // For QCustomPlot
+#include "Core/UndoRedoManager.h"
+#include "Core/DataModel.h"
+#include "qcustomplot.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QMenuBar>
 #include <QMenu>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QGroupBox>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , undoManager(new UndoRedoManager(this))
-    // , customPlot(nullptr) // MainWindow no longer owns QCustomPlot directly, it's in ui->plotView
+    , dataModel(new DataModel(this))
+    , stateVariableComboBox(nullptr)
+    , xAxisComboBox(nullptr)
+    , yAxisComboBox(nullptr)
+    , plotDataButton(nullptr)
 {
     ui->setupUi(this);
     setupUiElements();
@@ -30,40 +40,86 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupUiElements()
 {
-    // QCustomPlot is now managed by PlotView, which is accessible via ui->plotView.
-    // We retrieve the QCustomPlot instance from ui->plotView.
+    // Basic plot setup (axis labels)
     QCustomPlot *localCustomPlot = ui->plotView->getCustomPlot();
-
-    if (!localCustomPlot) {
-        qWarning("Failed to get QCustomPlot instance from ui->plotView.");
-        return; // Cannot proceed with plot setup
+    if (localCustomPlot) {
+        localCustomPlot->xAxis->setLabel("X Axis");
+        localCustomPlot->yAxis->setLabel("Y Axis");
+        localCustomPlot->replot();
+    } else {
+        qWarning("Failed to get QCustomPlot instance from ui->plotView in setupUiElements.");
     }
 
-    // Basic plot setup example using the QCustomPlot instance from PlotView
-    localCustomPlot->addGraph();
-    localCustomPlot->graph(0)->setPen(QPen(Qt::blue)); // QPen requires <QPen> or qcustomplot.h
-    localCustomPlot->xAxis->setLabel("x Axis");
-    localCustomPlot->yAxis->setLabel("y Axis");
+    // Create Data Selection Group Box (programmatically)
+    dataSelectionGroup = new QGroupBox(tr("Data Selection"));
+    QHBoxLayout *dataSelectionLayout = new QHBoxLayout();
 
-    // Generate some example data:
-    QVector<double> xData(101), yData(101);
-    for (int i = 0; i < 101; ++i)
-    {
-        xData[i] = i / 50.0 - 1; // x goes from -1 to 1
-        yData[i] = xData[i] * xData[i]; // example: y = x^2
+    // State Variable ComboBox (placeholder for now)
+    dataSelectionLayout->addWidget(new QLabel(tr("State:")));
+    stateVariableComboBox = new QComboBox();
+    stateVariableComboBox->setEnabled(false); // Disabled until multi-dataset/state var logic is added
+    stateVariableComboBox->addItem(tr("Default State"));
+    dataSelectionLayout->addWidget(stateVariableComboBox);
+
+    // X-Axis ComboBox
+    dataSelectionLayout->addWidget(new QLabel(tr("X-Axis:")));
+    xAxisComboBox = new QComboBox();
+    dataSelectionLayout->addWidget(xAxisComboBox);
+
+    // Y-Axis ComboBox
+    dataSelectionLayout->addWidget(new QLabel(tr("Y-Axis:")));
+    yAxisComboBox = new QComboBox();
+    dataSelectionLayout->addWidget(yAxisComboBox);
+
+    // Plot Button
+    plotDataButton = new QPushButton(tr("Plot Data"));
+    dataSelectionLayout->addWidget(plotDataButton);
+
+    dataSelectionGroup->setLayout(dataSelectionLayout);
+
+    // Add the group box to the main layout
+    // Assuming centralWidget has a QVBoxLayout as per the .ui file structure
+    if (ui->centralWidget && ui->centralWidget->layout()) {
+        // The .ui file has a QVBoxLayout directly on centralWidget.
+        // We add our groupbox to this existing layout.
+        ui->centralWidget->layout()->addWidget(dataSelectionGroup);
+    } else {
+        // Fallback if layout is not set as expected (should not happen with the provided .ui)
+        QVBoxLayout *mainLayout = new QVBoxLayout(ui->centralWidget);
+        mainLayout->addWidget(ui->plotView); // Ensure plotView is still there
+        mainLayout->addWidget(dataSelectionGroup);
+        // mainLayout->addWidget(ui->toolBar); // Toolbar is usually managed by QMainWindow itself
+        ui->centralWidget->setLayout(mainLayout);
+        qWarning("Central widget layout was not set as expected from .ui. Created new QVBoxLayout.");
     }
-    localCustomPlot->graph(0)->setData(xData, yData);
-    localCustomPlot->rescaleAxes();
-    localCustomPlot->replot();
 
-    // Further UI element setup can go here (e.g., toolbars, status bars)
-    setWindowTitle(tr("Data Visualizer Pro - V0.2")); // Updated version for clarity
+    setWindowTitle(tr("Data Visualizer Pro - V0.3"));
 }
 
 void MainWindow::setupConnections()
 {
-    // Connect UI element signals to slots here
-    // Example: connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
+    // File operations
+    // Assuming actionOpen is defined in the .ui file and accessible via ui->actionOpen
+    if (ui->actionOpen) {
+         connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
+    } else {
+        qWarning("ui->actionOpen is null. Ensure it's defined in mainwindow.ui and setupUi is called.");
+        // As a fallback, or if you prefer programmatic menu creation:
+        // QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+        // QAction *openAction = fileMenu->addAction(tr("&Open..."));
+        // connect(openAction, &QAction::triggered, this, &MainWindow::openFile);
+    }
+
+    // Data model connections
+    connect(dataModel, &DataModel::dataLoaded, this, &MainWindow::onDataLoaded);
+    connect(dataModel, &DataModel::errorOccurred, this, &MainWindow::onDataError);
+
+    // Plotting connection
+    if (plotDataButton) {
+        connect(plotDataButton, &QPushButton::clicked, this, &MainWindow::plotSelectedData);
+    } else {
+        qWarning("plotDataButton is null. Check setupUiElements.");
+    }
 }
 
 void MainWindow::setupUndoRedo() {
@@ -102,4 +158,110 @@ void MainWindow::setupUndoRedo() {
     connect(undoManager, &UndoRedoManager::canRedoChanged, redoAction, &QAction::setEnabled);
     undoAction->setEnabled(undoManager->canUndo());
     redoAction->setEnabled(undoManager->canRedo());
+}
+
+void MainWindow::openFile()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        this,
+        tr("Open Data File"),
+        QString(), // Default directory
+        tr("Excel Files (*.xlsx *.xls);;CSV Files (*.csv);;All Files (*)")
+    );
+
+    if (!filePath.isEmpty()) {
+        currentDataMatrix.clear(); // Clear previous data
+        xAxisComboBox->clear();
+        yAxisComboBox->clear();
+        // Potentially clear the plot or show a loading state
+        QCustomPlot *plot = ui->plotView->getCustomPlot();
+        if(plot) {
+            plot->clearGraphs();
+            plot->replot();
+        }
+        dataModel->loadExcel(filePath); // For now, only Excel is implemented in DataModel
+    }
+}
+
+void MainWindow::onDataLoaded(const QVector<QVector<double>> &data)
+{
+    currentDataMatrix = data;
+    if (data.isEmpty() || data.first().isEmpty()) {
+        QMessageBox::information(this, tr("Data Loaded"), tr("The file was loaded, but no data was found or data is empty."));
+        return;
+    }
+
+    int numColumns = data.first().size();
+    xAxisComboBox->clear();
+    yAxisComboBox->clear();
+
+    for (int i = 0; i < numColumns; ++i) {
+        QString columnName = tr("Column %1").arg(i + 1);
+        xAxisComboBox->addItem(columnName, i); // Store column index as item data
+        yAxisComboBox->addItem(columnName, i);
+    }
+
+    QMessageBox::information(this, tr("Data Loaded"), tr("Data loaded successfully. Please select X and Y axes to plot."));
+}
+
+void MainWindow::onDataError(const QString &errorMessage)
+{
+    QMessageBox::critical(this, tr("Error Loading Data"), errorMessage);
+    currentDataMatrix.clear();
+    xAxisComboBox->clear();
+    yAxisComboBox->clear();
+}
+
+void MainWindow::plotSelectedData()
+{
+    if (currentDataMatrix.isEmpty()) {
+        QMessageBox::warning(this, tr("No Data"), tr("Please load a data file first."));
+        return;
+    }
+
+    int xCol = xAxisComboBox->currentData().toInt();
+    int yCol = yAxisComboBox->currentData().toInt();
+
+    if (xAxisComboBox->currentIndex() < 0 || yAxisComboBox->currentIndex() < 0) {
+        QMessageBox::warning(this, tr("Selection Error"), tr("Please select valid X and Y axes."));
+        return;
+    }
+
+    QVector<double> xData, yData;
+    if (currentDataMatrix.first().size() <= qMax(xCol, yCol)) {
+         QMessageBox::critical(this, tr("Data Error"), tr("Selected column index out of bounds."));
+         return;
+    }
+
+    for (const auto &row : currentDataMatrix) {
+        if (row.size() > xCol) xData.append(row[xCol]);
+        else { /* Handle potential ragged data or error */ }
+        if (row.size() > yCol) yData.append(row[yCol]);
+        else { /* Handle potential ragged data or error */ }
+    }
+
+    if (xData.size() != yData.size() || xData.isEmpty()) {
+        QMessageBox::warning(this, tr("Plotting Error"), tr("Selected data columns are invalid or empty."));
+        return;
+    }
+
+    QCustomPlot *plot = ui->plotView->getCustomPlot();
+    if (!plot) {
+        qWarning("QCustomPlot instance is null in plotSelectedData.");
+        return;
+    }
+
+    plot->clearGraphs(); // Clear previous plots
+    plot->addGraph();
+    plot->graph(0)->setData(xData, yData);
+    plot->graph(0)->setPen(QPen(Qt::blue)); // Example pen
+    // plot->graph(0)->setLineStyle(QCPGraph::lsNone); // Example: scatter plot
+    // plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, Qt::blue, Qt::white, 5));
+
+    // Set labels based on selected columns (optional)
+    plot->xAxis->setLabel(xAxisComboBox->currentText());
+    plot->yAxis->setLabel(yAxisComboBox->currentText());
+
+    plot->rescaleAxes();
+    plot->replot();
 }
