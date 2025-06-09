@@ -1,0 +1,28 @@
+{
+  "app": {
+    "name": "Scientific Analysis Tool",
+    "version": "0.1.0",
+    "author": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "ui": {
+    "theme": "light",
+    "font_size": 10,
+    "recent_files": []
+  },
+  "data": {
+    "default_directory": "",
+    "auto_save": false,
+    "auto_save_interval": 300
+  },
+  "plotting": {
+    "default_style": "seaborn",
+    "figure_size": [8, 6],
+    "dpi": 100
+  },
+  "ai": {
+    "enabled": false,
+    "provider": "openai",
+    "api_key": ""
+  }
+}
