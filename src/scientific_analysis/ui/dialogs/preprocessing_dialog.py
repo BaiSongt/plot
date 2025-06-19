@@ -19,10 +19,10 @@ from PySide6.QtGui import QIcon
 import pandas as pd
 import numpy as np
 
-from ...data.preprocessing import (
+from scientific_analysis.data.preprocessing import (
     DataPreprocessor, MissingValueStrategy, DataType, NormalizationMethod
 )
-from ...utils.logger import get_logger
+from scientific_analysis.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

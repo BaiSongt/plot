@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 import h5py
 
-from ..models import Dataset
+from scientific_analysis.models import Dataset
 from .io import DataIO
 
 logger = logging.getLogger(__name__)

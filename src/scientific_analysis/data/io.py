@@ -11,8 +11,8 @@ import pandas as pd
 import h5py
 import numpy as np
 
-from ..config import config
-from ..utils import ensure_directory_exists
+from scientific_analysis.config import config
+from scientific_analysis.utils import ensure_directory_exists
 
 class DataIO:
     """Handles data import and export operations."""

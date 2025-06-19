@@ -9,8 +9,8 @@ import numpy as np
 from enum import Enum, auto
 
 from .base import BaseAnalyzer, AnalysisResult
-from ..models.dataset import Dataset
-from ..visualization import LineChart, BarChart, HistogramChart, BoxPlot
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.visualization import LineChart, BarChart, HistogramChart, BoxPlot
 from .descriptive_outlier_detection import detect_outliers_iqr, detect_outliers_zscore, detect_outliers_isolation
 
 
@@ -284,7 +284,7 @@ class DescriptiveAnalyzer(BaseAnalyzer):
         # 为分类列创建条形图
         for column in categorical_cols:
             # 这里需要导入BarChart类
-            from ..visualization.charts import BarChart
+            from scientific_analysis.visualization.charts import BarChart
             # 计算频率数据
             value_counts = data[column].value_counts()
             bar_chart = BarChart(data=value_counts.to_frame().reset_index(), 

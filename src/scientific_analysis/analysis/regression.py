@@ -11,8 +11,8 @@ import scipy.stats as stats
 import statsmodels.api as sm
 
 from .base import BaseAnalyzer, AnalysisResult
-from ..models.dataset import Dataset
-from ..visualization import LineChart, ScatterChart
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.visualization import LineChart, ScatterChart
 
 
 class RegressionType(Enum):

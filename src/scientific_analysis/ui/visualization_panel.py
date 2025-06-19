@@ -18,12 +18,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
-from ..visualization import (
+from scientific_analysis.visualization import (
     BaseChart, ChartType, LineChart, BarChart, ScatterChart,
     HistogramChart, PieChart, BoxPlot, HeatmapChart, ChartExporter
 )
-from ..models.dataset import Dataset
-from ..data.manager import DataManager
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.data.manager import DataManager
 
 
 class MatplotlibCanvas(FigureCanvas):

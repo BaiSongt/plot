@@ -10,8 +10,8 @@ from enum import Enum, auto
 import scipy.stats as stats
 
 from .base import BaseAnalyzer, AnalysisResult
-from ..models.dataset import Dataset
-from ..visualization import HeatmapChart, ScatterChart
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.visualization import HeatmapChart, ScatterChart
 
 
 class CorrelationMethod(Enum):

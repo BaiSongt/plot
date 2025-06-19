@@ -10,8 +10,8 @@ import json
 import uuid
 from datetime import datetime
 
-from ..models.dataset import Dataset
-from ..visualization import BaseChart
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.visualization import BaseChart
 
 
 class AnalysisResult:

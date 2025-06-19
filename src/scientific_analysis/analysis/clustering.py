@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 from .base import BaseAnalyzer, AnalysisResult
-from ..models.dataset import Dataset
-from ..visualization import ScatterChart, HeatmapChart
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.visualization import ScatterChart, HeatmapChart
 
 
 class ClusteringMethod(Enum):
@@ -471,7 +471,7 @@ class ClusteringAnalyzer(BaseAnalyzer):
             # 保存图表
             import io
             import base64
-            from ..visualization.base import BaseChart
+            from scientific_analysis.visualization.base import BaseChart
             
             buf = io.BytesIO()
             plt.savefig(buf, format='png', dpi=100)
@@ -524,7 +524,7 @@ class ClusteringAnalyzer(BaseAnalyzer):
             # 保存图表
             import io
             import base64
-            from ..visualization.base import BaseChart
+            from scientific_analysis.visualization.base import BaseChart
             
             buf = io.BytesIO()
             plt.savefig(buf, format='png', dpi=100)

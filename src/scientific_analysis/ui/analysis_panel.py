@@ -18,13 +18,13 @@ from PySide6.QtGui import QIcon
 import pandas as pd
 import numpy as np
 
-from ..analysis import (
+from scientific_analysis.analysis import (
     BaseAnalyzer, AnalysisResult, DescriptiveAnalyzer,
     CorrelationAnalyzer, RegressionAnalyzer, RegressionType,
     ClusteringAnalyzer, ClusteringMethod
 )
-from ..models.dataset import Dataset
-from ..data.manager import DataManager
+from scientific_analysis.models.dataset import Dataset
+from scientific_analysis.data.manager import DataManager
 from .visualization_panel import ChartPanel
 
 
