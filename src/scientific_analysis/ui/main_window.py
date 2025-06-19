@@ -3,11 +3,16 @@ Main application window for the Scientific Analysis Tool.
 """
 
 from PySide6.QtWidgets import (
-    QMainWindow, QDockWidget, QWidget, QVBoxLayout, 
-    QTabWidget, QStatusBar, QMenuBar, QMenu, QFileDialog, QMessageBox
+    QMainWindow, QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
+    QTabWidget, QStatusBar, QMenuBar, QMenu, QToolBar, QFileDialog, QMessageBox, QDialog
 )
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QAction, QIcon
+
+from .preprocessing_dialog import PreprocessingDialog
+from .visualization_panel import VisualizationPanel
+from .analysis_panel import AnalysisPanel
+from ..data.manager import DataManager
 
 from scientific_analysis.data.preprocessing import (  # 使用绝对路径导入
     DataPreprocessor, MissingValueStrategy, DataType, NormalizationMethod
@@ -23,6 +28,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Scientific Analysis Tool")
         self.setMinimumSize(1024, 768)
         
+        # Initialize data manager
+        self.data_manager = DataManager()
+        
         # Initialize UI components
         self._create_actions()
         self._create_menu_bar()
@@ -32,6 +40,7 @@ class MainWindow(QMainWindow):
         
         # Initialize application state
         self.current_file = None
+        self.current_dataset = None
     
     def _create_actions(self):
         """Create menu actions."""
@@ -81,6 +90,13 @@ class MainWindow(QMainWindow):
         view_menu = menubar.addMenu("&View")
         # Add view actions here
         
+        # Data menu
+        data_menu = menubar.addMenu("&Data")
+        # Create data preprocessing action
+        self.preprocess_action = QAction("&Preprocessing", self)
+        self.preprocess_action.triggered.connect(self.open_preprocessing_dialog)
+        data_menu.addAction(self.preprocess_action)
+        
         # Tools menu
         tools_menu = menubar.addMenu("&Tools")
         # Add tools actions here
@@ -117,6 +133,14 @@ class MainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         self.tab_widget.setTabsClosable(True)
         self.tab_widget.tabCloseRequested.connect(self.close_tab)
+        
+        # Create visualization panel
+        self.visualization_panel = VisualizationPanel(self.data_manager)
+        self.tab_widget.addTab(self.visualization_panel, "Visualization")
+        
+        # Create analysis panel
+        self.analysis_panel = AnalysisPanel(self.data_manager)
+        self.tab_widget.addTab(self.analysis_panel, "Analysis")
         
         layout.addWidget(self.tab_widget)
     

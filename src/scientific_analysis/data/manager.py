@@ -99,6 +99,22 @@ class DataManager:
         """
         return self._datasets.get(name)
     
+    def get_dataset_names(self) -> List[str]:
+        """Get all dataset names.
+        
+        Returns:
+            List[str]: List of all dataset names.
+        """
+        return list(self._datasets.keys())
+    
+    def get_current_dataset(self) -> Optional[Dataset]:
+        """Get the current active dataset.
+        
+        Returns:
+            Optional[Dataset]: The current dataset if set, None otherwise.
+        """
+        return self.current_dataset
+    
     def set_current_dataset(self, name: str) -> bool:
         """Set the current active dataset.
         
@@ -259,3 +275,36 @@ class DataManager:
         except Exception as e:
             logger.error(f"Error exporting to clipboard: {str(e)}", exc_info=True)
             return False
+    
+    def rename_dataset(self, old_name: str, new_name: str) -> bool:
+        """Rename a dataset.
+        
+        Args:
+            old_name: Current name of the dataset.
+            new_name: New name for the dataset.
+            
+        Returns:
+            bool: True if the dataset was renamed successfully, False otherwise.
+        """
+        if old_name not in self._datasets:
+            logger.error(f"Dataset '{old_name}' not found")
+            return False
+            
+        if new_name in self._datasets:
+            logger.error(f"Dataset name '{new_name}' already exists")
+            return False
+            
+        # Get the dataset and update its name
+        dataset = self._datasets[old_name]
+        dataset.name = new_name
+        
+        # Update the datasets dictionary
+        self._datasets[new_name] = dataset
+        del self._datasets[old_name]
+        
+        # Update current dataset reference if needed
+        if self._current_dataset == old_name:
+            self._current_dataset = new_name
+            
+        logger.info(f"Renamed dataset from '{old_name}' to '{new_name}'")
+        return True

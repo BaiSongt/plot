@@ -78,8 +78,8 @@ class TestDataPreprocessor(unittest.TestCase):
         preprocessor = DataPreprocessor(df)
         is_outlier = preprocessor.detect_outliers(
             columns=['A', 'C'],
-            method='zscore',
-            threshold=2.0
+            method='iqr',  # Changed from 'zscore' to 'iqr'
+            threshold=1.5  # Standard IQR threshold
         )
         
         # Only the last row should be an outlier

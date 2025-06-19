@@ -159,9 +159,9 @@ class DataPreprocessor:
         return self
     
     def detect_outliers(self, 
-                      columns: List[str] = None,
-                      method: str = 'zscore',
-                      threshold: float = 3.0) -> pd.Series:
+                    columns: List[str] = None,
+                    method: str = 'zscore',
+                    threshold: float = 3.0) -> pd.Series:
         """Detect outliers in numeric columns.
         
         Args:
@@ -172,28 +172,68 @@ class DataPreprocessor:
         Returns:
             Boolean Series indicating outlier positions.
         """
+        # Get numeric columns if none specified
         numeric_cols = self.df.select_dtypes(include=['number']).columns
         columns = columns or numeric_cols
-        columns = [col for col in columns if col in numeric_cols]
+        
+        # Ensure columns exist in the DataFrame
+        columns = [col for col in columns if col in self.df.columns and col in numeric_cols]
         
         if not columns:
             return pd.Series(False, index=self.df.index)
         
+        # Create a copy of the dataframe for calculations to avoid modifying original
+        df_calc = self.df[columns].copy()
+        
+        # Initialize result series with False
+        is_outlier = pd.Series(False, index=self.df.index)
+        
         if method == 'zscore':
-            z_scores = (self.df[columns] - self.df[columns].mean()) / self.df[columns].std()
-            is_outlier = (z_scores.abs() > threshold).any(axis=1)
+            # Calculate z-scores for each column, handling NaN values
+            for col in columns:
+                # Skip columns with all NaN values
+                if df_calc[col].isna().all():
+                    continue
+                    
+                # Calculate mean and std without NaN values
+                mean = df_calc[col].mean()
+                std = df_calc[col].std()
+                
+                # Skip if std is zero (all values are the same)
+                if std == 0:
+                    continue
+                    
+                # Calculate z-scores
+                z_scores = (df_calc[col] - mean) / std
+                
+                # Update outlier flags
+                is_outlier = is_outlier | (z_scores.abs() > threshold)
+                
         elif method == 'iqr':
-            q1 = self.df[columns].quantile(0.25)
-            q3 = self.df[columns].quantile(0.75)
-            iqr = q3 - q1
-            lower_bound = q1 - (threshold * iqr)
-            upper_bound = q3 + (threshold * iqr)
-            is_outlier = ((self.df[columns] < lower_bound) | 
-                         (self.df[columns] > upper_bound)).any(axis=1)
+            # Calculate IQR for each column
+            for col in columns:
+                # Skip columns with all NaN values
+                if df_calc[col].isna().all():
+                    continue
+                    
+                q1 = df_calc[col].quantile(0.25)
+                q3 = df_calc[col].quantile(0.75)
+                iqr = q3 - q1
+                
+                # Skip if IQR is zero
+                if iqr == 0:
+                    continue
+                    
+                lower_bound = q1 - (threshold * iqr)
+                upper_bound = q3 + (threshold * iqr)
+                
+                # Update outlier flags
+                is_outlier = is_outlier | ((df_calc[col] < lower_bound) | (df_calc[col] > upper_bound))
         else:
             raise ValueError(f"Unsupported outlier detection method: {method}")
-            
-        return is_outlier
+        
+        # Convert to Python bool to avoid numpy bool issues in assertions
+        return pd.Series([bool(x) for x in is_outlier], index=self.df.index)
     
     def remove_outliers(self, 
                        columns: List[str] = None,
