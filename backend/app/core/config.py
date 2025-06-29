@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List, Any, Dict, Optional, Union
 from pydantic import PostgresDsn, validator, field_validator
+from pydantic_settings import BaseSettings
 import secrets
 import os
 from pathlib import Path

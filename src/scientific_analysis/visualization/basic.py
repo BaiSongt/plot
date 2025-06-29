@@ -201,7 +201,6 @@ class BasicVisualizer:
         Returns:
             matplotlib的Figure对象
         """
-        # 创建一个新的图形和单个子图
         fig, ax = plt.subplots(figsize=(10, 6))
         
         if self.data is None:
@@ -210,26 +209,10 @@ class BasicVisualizer:
         if isinstance(self.data, pd.DataFrame):
             # 如果是DataFrame，绘制指定变量的箱线图
             data_to_plot = [self.data[var] for var in variables]
-            
-            # 在单个子图中绘制所有变量的箱线图
-            # 使用patch_artist=True确保生成可见的箱体
-            box_plot = ax.boxplot(data_to_plot, labels=variables, patch_artist=True, **kwargs)
-            
-            # 为每个箱体设置不同的颜色
-            colors = ['lightblue', 'lightgreen']
-            for patch, color in zip(box_plot['boxes'], colors):
-                patch.set_facecolor(color)
-                
-                # 手动将每个箱体添加到artists列表中
-                from matplotlib.patches import Rectangle
-                x, y = patch.get_path().vertices[0]
-                width = patch.get_path().vertices[2][0] - x
-                height = patch.get_path().vertices[2][1] - y
-                rect = Rectangle((x, y), width, height, facecolor=color, alpha=0.7)
-                ax.add_artist(rect)
+            ax.boxplot(data_to_plot, labels=variables, **kwargs)
         else:
             # 如果不是DataFrame，直接绘制
-            ax.boxplot(self.data, patch_artist=True, **kwargs)
+            ax.boxplot(self.data, **kwargs)
             
         ax.set_title(title)
         ax.set_xlabel(xlabel)

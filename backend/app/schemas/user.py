@@ -1,11 +1,12 @@
 from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
 from datetime import datetime
+from pydantic import BaseModel, Field, EmailStr, validator
 
 class UserBase(BaseModel):
     """用户基础模型"""
     email: EmailStr
-    username: str = Field(..., min_length=3, max_length=50, regex="^[a-zA-Z0-9_-]+$")
+    username: str = Field(..., min_length=3, max_length=50, pattern="^[a-zA-Z0-9_-]+$")
 
 class UserCreate(UserBase):
     """用户创建模型"""
@@ -26,7 +27,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     """用户更新模型"""
     email: Optional[EmailStr] = None
-    username: Optional[str] = Field(None, min_length=3, max_length=50, regex="^[a-zA-Z0-9_-]+$")
+    username: Optional[str] = Field(None, min_length=3, max_length=50, pattern="^[a-zA-Z0-9_-]+$")
     password: Optional[str] = Field(None, min_length=8, max_length=50)
 
 class UserInDBBase(UserBase):
@@ -44,11 +45,11 @@ class User(UserInDBBase):
     """用户响应模型"""
     pass
 
-class Token(BaseModel):
-    """令牌响应模型"""
-    access_token: str
-    token_type: str = "bearer"
+class UserInDB(UserInDBBase):
+    """数据库中的用户模型"""
+    hashed_password: str
 
 class TokenData(BaseModel):
     """令牌数据模型"""
+    username: Optional[str] = None
     username: Optional[str] = None

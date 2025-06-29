@@ -1,0 +1,32 @@
+{
+  "backend": {
+    "url": "http://localhost:8000",
+    "timeout": 30,
+    "retry_attempts": 3
+  },
+  "frontend": {
+    "url": "http://localhost:3000",
+    "auto_open": true
+  },
+  "database": {
+    "url": "sqlite:///./scientific_analysis.db"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/app.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  },
+  "ui": {
+    "theme": "dark",
+    "language": "zh_CN",
+    "auto_save": true,
+    "auto_save_interval": 300
+  },
+  "data": {
+    "default_format": "csv",
+    "max_file_size": "100MB",
+    "cache_enabled": true,
+    "cache_size": "500MB"
+  }
+}

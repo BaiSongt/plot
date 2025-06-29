@@ -12,8 +12,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 
 # 导入应用配置和模型
-from app.core.config import settings
-from app.db.base import Base
+from ...core.config import settings
+from ...db.base import Base
 
 # 这是 Alembic 配置对象，提供对 .ini 文件中的值的访问。
 config = context.config

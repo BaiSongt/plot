@@ -230,6 +230,26 @@ class DataManager:
             logger.error(f"Error saving dataset to {file_path}: {str(e)}", exc_info=True)
             return False
     
+    def get_all_datasets(self) -> Dict[str, Dataset]:
+        """获取所有数据集"""
+        return self._datasets.copy()
+    
+    def get_dataset_info(self, name: str) -> Dict:
+        """获取数据集信息"""
+        if name not in self._datasets:
+            raise ValueError(f"数据集 '{name}' 不存在")
+        
+        dataset = self._datasets[name]
+        data = dataset.data
+        return {
+            'name': name,
+            'shape': list(data.shape),
+            'columns': list(data.columns),
+            'dtypes': {col: str(dtype) for col, dtype in data.dtypes.items()},
+            'memory_usage': data.memory_usage(deep=True).sum(),
+            'missing_values': data.isnull().sum().to_dict()
+        }
+    
     def import_from_clipboard(self, **kwargs) -> Optional[Dataset]:
         """Import data from the system clipboard.
         

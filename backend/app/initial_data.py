@@ -3,11 +3,11 @@ from typing import Any, Dict
 
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
-from app.core.security import get_password_hash
-from app.db.base_class import Base
-from app.db.session import engine, SessionLocal
-from app.models.user import User
+from .core.config import settings
+from .core.security import get_password_hash
+from .db.base_class import Base
+from .db.session import engine, SessionLocal
+from .models.user import User
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,8 +1,8 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.models.visualization import Visualization
-from app.schemas.visualization import VisualizationCreate, VisualizationUpdate
+from ..models.visualization import Visualization
+from ..schemas.visualization import VisualizationCreate, VisualizationUpdate
 
 def get_visualization(db: Session, visualization_id: int) -> Optional[Visualization]:
     """通过ID获取单个可视化"""

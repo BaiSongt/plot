@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.core.config import settings
+from ..core.config import settings
 
 # 创建数据库引擎
 engine = create_engine(

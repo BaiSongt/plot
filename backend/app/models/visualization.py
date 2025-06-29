@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 
-from app.db.base_class import Base
+from ..db.base_class import Base
 
 class Visualization(Base):
     """数据可视化模型"""

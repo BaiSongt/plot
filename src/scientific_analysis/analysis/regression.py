@@ -11,8 +11,8 @@ import scipy.stats as stats
 import statsmodels.api as sm
 
 from .base import BaseAnalyzer, AnalysisResult
-from scientific_analysis.models.dataset import Dataset
-from scientific_analysis.visualization import LineChart, ScatterChart
+from ..models.dataset import Dataset
+from ..visualization import LineChart, ScatterChart
 
 
 class RegressionType(Enum):
@@ -628,12 +628,9 @@ class RegressionAnalyzer(BaseAnalyzer):
                     equation += f" - {abs(params[i+1]):.4f}{var}"
                     
             # 创建结果数据
-            coefficients_dict = {var: params[i+1] for i, var in enumerate(independent_vars)}
-            coefficients_dict['intercept'] = params[0]  # 添加截距到系数字典中
-            
             result_data = {
                 'model_summary': model.summary().as_text(),
-                'coefficients': coefficients_dict,
+                'coefficients': {var: params[i+1] for i, var in enumerate(independent_vars)},
                 'intercept': params[0],
                 'confidence_intervals': {var: (conf_int[i+1][0], conf_int[i+1][1]) 
                                        for i, var in enumerate(independent_vars)},
@@ -689,11 +686,8 @@ class RegressionAnalyzer(BaseAnalyzer):
                     equation += f" - {abs(coefficients[i]):.4f}{var}"
                     
             # 创建结果数据
-            coefficients_dict = {var: coefficients[i] for i, var in enumerate(independent_vars)}
-            coefficients_dict['intercept'] = intercept  # 添加截距到系数字典中
-            
             result_data = {
-                'coefficients': coefficients_dict,
+                'coefficients': {var: coefficients[i] for i, var in enumerate(independent_vars)},
                 'intercept': intercept,
                 'r_squared': r_squared,
                 'mse': mse,

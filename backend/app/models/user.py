@@ -5,8 +5,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from app.core.config import settings
-from app.db.base_class import Base
+from ..core.config import settings
+from ..db.base_class import Base
 
 # 密码加密上下文
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
