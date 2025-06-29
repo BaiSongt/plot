@@ -5,7 +5,7 @@ import {
   BarChartOutlined,
   LineChartOutlined,
   PieChartOutlined,
-  ScatterChartOutlined,
+  DotChartOutlined,
   SettingOutlined,
   UserOutlined
 } from '@ant-design/icons';
@@ -175,7 +175,7 @@ function App() {
         return (
           <Card title="散点图" style={{ margin: '16px' }}>
             <div style={{ textAlign: 'center', padding: '40px' }}>
-              <ScatterChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
+              <DotChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
               <p>散点图组件开发中...</p>
             </div>
           </Card>
@@ -184,7 +184,7 @@ function App() {
         return (
           <Card title="3D散点图" style={{ margin: '16px' }}>
             <div style={{ textAlign: 'center', padding: '40px' }}>
-              <ScatterChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
+              <DotChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
               <p>3D散点图组件开发中...</p>
             </div>
           </Card>
