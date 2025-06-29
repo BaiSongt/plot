@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Scatter3D } from '@/components/charts';
+import { Scatter3D } from '../components/charts';
 import { Card, Slider, Switch, Space, Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;

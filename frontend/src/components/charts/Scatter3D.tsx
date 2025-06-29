@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, Point } from '@react-three/drei';
 import * as THREE from 'three';
 import Scene from './three/Scene';
-import { ChartData, ChartOptions } from '@/types/chart';
+import { ChartData, ChartOptions } from '../../types/chart';
 
 interface Scatter3DData extends ChartData {
   /** X轴值 */
