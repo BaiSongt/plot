@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Upload, Button, Card, Table, message } from 'antd';
+import { Layout, Menu, Upload, Button, Card, Table, message, Space, Popconfirm } from 'antd';
 import {
   UploadOutlined,
   BarChartOutlined,
@@ -7,9 +7,18 @@ import {
   PieChartOutlined,
   DotChartOutlined,
   SettingOutlined,
-  UserOutlined
+  UserOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  FunctionOutlined,
+  DownloadOutlined
 } from '@ant-design/icons';
 import type { MenuProps, UploadProps } from 'antd';
+import ChartContainer from './components/ChartContainer';
+import AnalysisPanel from './components/AnalysisPanel';
+import DataPreview from './components/DataPreview';
+import ExportPanel from './components/ExportPanel';
+import { useDataManager } from './hooks/useDataManager';
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
@@ -42,13 +51,17 @@ const menuItems: MenuItem[] = [
     getItem('散点图', 'scatter'),
     getItem('3D散点图', 'scatter3d'),
   ]),
+  getItem('数据分析', 'analysis', <FunctionOutlined />),
+  getItem('数据导出', 'export', <DownloadOutlined />),
   getItem('用户设置', 'settings', <SettingOutlined />),
 ];
 
 function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState('upload');
-  const [dataList, setDataList] = useState<any[]>([]);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewDatasetId, setPreviewDatasetId] = useState<string>('');
+  const { dataList, loading, fetchDataList, deleteDataset } = useDataManager();
 
   const uploadProps: UploadProps = {
     name: 'file',
@@ -93,23 +106,20 @@ function App() {
     },
   };
 
-  // 获取数据列表
-  const fetchDataList = async () => {
-    try {
-      // 暂时使用模拟数据，后续连接真实API
-      const mockData = [
-        {
-          key: '1',
-          filename: 'sample_data.csv',
-          size: '2.5 MB',
-          uploadTime: '2024-01-15 10:30:00',
-          status: '已处理'
-        }
-      ];
-      setDataList(mockData);
-    } catch (error) {
-      message.error('获取数据列表失败');
-    }
+  // 处理数据集删除
+  const handleDeleteDataset = async (datasetId: string) => {
+    await deleteDataset(datasetId);
+    message.success('数据集删除成功');
+  };
+
+  const handlePreviewDataset = (id: string) => {
+    setPreviewDatasetId(id);
+    setPreviewVisible(true);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewVisible(false);
+    setPreviewDatasetId('');
   };
 
   const renderContent = () => {
@@ -133,62 +143,73 @@ function App() {
         return (
           <Card title="数据列表" style={{ margin: '16px' }}>
             <Table
-              dataSource={dataList}
+              dataSource={dataList.map(item => ({ ...item, key: item.id }))}
+              loading={loading}
               columns={[
                 { title: '文件名', dataIndex: 'filename', key: 'filename' },
                 { title: '大小', dataIndex: 'size', key: 'size' },
                 { title: '上传时间', dataIndex: 'uploadTime', key: 'uploadTime' },
                 { title: '状态', dataIndex: 'status', key: 'status' },
+                { 
+                  title: '列数', 
+                  dataIndex: 'columns', 
+                  key: 'columns',
+                  render: (columns: string[]) => columns?.length || '-'
+                },
+                { 
+                  title: '行数', 
+                  dataIndex: 'rowCount', 
+                  key: 'rowCount',
+                  render: (count: number) => count || '-'
+                },
+                {
+                  title: '操作',
+                  key: 'action',
+                  render: (_, record) => (
+                    <Space size="middle">
+                      <Button
+                        type="link"
+                        icon={<EyeOutlined />}
+                        onClick={() => handlePreviewDataset(record.id)}
+                      >
+                        预览
+                      </Button>
+                      <Popconfirm
+                        title="确定要删除这个数据集吗？"
+                        onConfirm={() => handleDeleteDataset(record.id)}
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <Button
+                          type="link"
+                          danger
+                          icon={<DeleteOutlined />}
+                        >
+                          删除
+                        </Button>
+                      </Popconfirm>
+                    </Space>
+                  ),
+                },
               ]}
               pagination={{ pageSize: 10 }}
             />
           </Card>
         );
       case 'bar':
-        return (
-          <Card title="柱状图" style={{ margin: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <BarChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
-              <p>柱状图组件开发中...</p>
-            </div>
-          </Card>
-        );
+        return <ChartContainer chartType="bar" title="柱状图分析" />;
       case 'line':
-        return (
-          <Card title="折线图" style={{ margin: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <LineChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
-              <p>折线图组件开发中...</p>
-            </div>
-          </Card>
-        );
+        return <ChartContainer chartType="line" title="趋势分析" />;
       case 'pie':
-        return (
-          <Card title="饼图" style={{ margin: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <PieChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
-              <p>饼图组件开发中...</p>
-            </div>
-          </Card>
-        );
+        return <ChartContainer chartType="pie" title="比例分析" />;
       case 'scatter':
-        return (
-          <Card title="散点图" style={{ margin: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <DotChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
-              <p>散点图组件开发中...</p>
-            </div>
-          </Card>
-        );
+        return <ChartContainer chartType="scatter" title="相关性分析" />;
       case 'scatter3d':
-        return (
-          <Card title="3D散点图" style={{ margin: '16px' }}>
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <DotChartOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
-              <p>3D散点图组件开发中...</p>
-            </div>
-          </Card>
-        );
+        return <ChartContainer chartType="scatter3d" title="3D数据分析" />;
+      case 'analysis':
+        return <AnalysisPanel />;
+      case 'export':
+        return <ExportPanel />;
       case 'settings':
         return (
           <Card title="用户设置" style={{ margin: '16px' }}>
@@ -250,8 +271,15 @@ function App() {
           {renderContent()}
         </Content>
       </Layout>
+      
+      {/* 数据预览模态框 */}
+      <DataPreview
+        datasetId={previewDatasetId}
+        visible={previewVisible}
+        onClose={handleClosePreview}
+      />
     </Layout>
   );
-}
+};
 
 export default App;

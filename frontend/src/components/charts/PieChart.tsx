@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseChart from './BaseChart';
-import { EChartsOption } from 'echarts';
-import { ChartData, ChartOptions } from '@/types/chart';
+import type { EChartsOption } from 'echarts';
+import type { ChartData, ChartOptions } from '@/types/chart';
 
 interface PieChartProps extends ChartOptions {
   /** 图表数据 */

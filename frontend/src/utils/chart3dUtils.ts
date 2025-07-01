@@ -145,10 +145,12 @@ export const createAxesHelper = (size: number = 10) => {
   const axesHelper = new THREE.AxesHelper(size);
   
   // 设置坐标轴颜色
-  const axesMaterial = axesHelper.material as THREE.Material[];
-  axesMaterial[0].color = new THREE.Color(0xff0000); // X轴 - 红色
-  axesMaterial[1].color = new THREE.Color(0x00ff00); // Y轴 - 绿色
-  axesMaterial[2].color = new THREE.Color(0x0000ff); // Z轴 - 蓝色
+  const axesMaterial = axesHelper.material as THREE.MeshBasicMaterial[];
+  if (axesMaterial && Array.isArray(axesMaterial)) {
+    axesMaterial[0] && (axesMaterial[0].color = new THREE.Color(0xff0000)); // X轴 - 红色
+    axesMaterial[1] && (axesMaterial[1].color = new THREE.Color(0x00ff00)); // Y轴 - 绿色
+    axesMaterial[2] && (axesMaterial[2].color = new THREE.Color(0x0000ff)); // Z轴 - 蓝色
+  }
   
   return axesHelper;
 };
@@ -250,7 +252,7 @@ export const calculateCameraPosition = (boundingBox: {
   max: THREE.Vector3;
   center: THREE.Vector3;
   size: THREE.Vector3;
-}, fov: number = 50, aspect: number = 1) => {
+}, fov: number = 50) => {
   const { center, size } = boundingBox;
   
   // 计算相机距离，确保整个场景在视图中

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as echarts from 'echarts';
-import { EChartsType, EChartsOption, SetOptionOpts } from 'echarts';
-import { ChartOptions, ChartData, ChartSize } from '@/types/chart';
+import type { SetOptionOpts } from 'echarts';
+import type { EChartsType, EChartsOption } from 'echarts';
+import type { ChartOptions, ChartData, ChartSize } from '../../types/chart';
 
-interface BaseChartProps extends ChartOptions {
+interface BaseChartProps extends Omit<ChartOptions, 'theme' | 'onRendered'> {
   /** 图表数据 */
   data?: ChartData[];
   /** 图表配置 */

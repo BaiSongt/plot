@@ -1,7 +1,7 @@
 import React from 'react';
 import BaseChart from './BaseChart';
-import { EChartsOption } from 'echarts';
-import { ChartData, ChartOptions } from '@/types/chart';
+import type { EChartsOption } from 'echarts';
+import type { ChartData, ChartOptions } from '@/types/chart';
 
 interface ScatterData extends ChartData {
   /** X轴值 */
@@ -63,9 +63,9 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           const sizes = data.map((item) => item.symbolSize || 10);
           const minSize = Math.min(...sizes);
           const maxSize = Math.max(...sizes);
-          
+
           if (minSize === maxSize) return minSize;
-          
+
           const sizeRange = maxSize - minSize;
           const normalizedSize = ((val[2] || minSize) - minSize) / sizeRange;
           return minSymbolSize + normalizedSize * (maxSymbolSize - minSymbolSize);
@@ -101,18 +101,18 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
     if (showRegressionLine && data.length > 1) {
       const xData = data.map((item) => item.x);
       const yData = data.map((item) => item.y);
-      
+
       // 计算回归线
       const regression = calculateRegression(xData, yData);
-      
+
       // 获取X轴范围
       const xMin = Math.min(...xData);
       const xMax = Math.max(...xData);
-      
+
       // 计算回归线起点和终点
       const start = [xMin, regression.slope * xMin + regression.intercept];
       const end = [xMax, regression.slope * xMax + regression.intercept];
-      
+
       // 添加回归线系列
       series.push({
         type: 'line',
@@ -127,7 +127,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         },
         silent: true,
       });
-      
+
       // 添加R²值
       if (regression.rSquared) {
         series[0].markLine = {
@@ -177,18 +177,18 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
 
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
-    
+
     // 计算R²
     let ssTot = 0;
     let ssRes = 0;
     const yMean = sumY / n;
-    
+
     for (let i = 0; i < n; i++) {
       const yPred = slope * xData[i] + intercept;
       ssTot += Math.pow(yData[i] - yMean, 2);
       ssRes += Math.pow(yData[i] - yPred, 2);
     }
-    
+
     const rSquared = 1 - (ssRes / ssTot);
 
     return { slope, intercept, rSquared };
@@ -276,16 +276,16 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
       formatter: (params: any) => {
         const param = params[0];
         if (!param || !param.value) return '';
-        
+
         const dataItem = data[param.dataIndex];
         let tooltip = `<div style="margin-bottom: 5px; font-weight: bold;">${dataItem?.name || '数据点'}</div>`;
         tooltip += `<div>${xAxisName || 'X'}: ${param.value[0]}</div>`;
         tooltip += `<div>${yAxisName || 'Y'}: ${param.value[1]}</div>`;
-        
+
         if (dataItem?.symbolSize) {
           tooltip += `<div>大小: ${dataItem.symbolSize}</div>`;
         }
-        
+
         return tooltip;
       },
     },

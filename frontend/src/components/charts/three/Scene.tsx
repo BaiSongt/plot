@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Stats, PerspectiveCamera, OrthographicCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import { EffectComposer, Bloom, DepthOfField, SSR } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing';
 
 interface SceneProps {
   /** 子元素 */
@@ -108,7 +108,7 @@ const Scene: React.FC<SceneProps> = ({
           sceneRef.current = scene;
           cameraRef.current = camera;
           rendererRef.current = gl;
-          
+
           // 设置抗锯齿
           gl.setPixelRatio(window.devicePixelRatio);
           gl.shadowMap.enabled = true;
@@ -117,7 +117,7 @@ const Scene: React.FC<SceneProps> = ({
       >
         {/* 环境光 */}
         <ambientLight intensity={0.5} />
-        
+
         {/* 平行光 */}
         <directionalLight
           position={[10, 10, 5]}
@@ -131,7 +131,7 @@ const Scene: React.FC<SceneProps> = ({
 
         {/* 坐标轴辅助 */}
         {showAxes && <axesHelper args={[5]} />}
-        
+
         {/* 网格辅助 */}
         {showGrid && (
           <gridHelper args={[10, 10]}>
@@ -159,32 +159,6 @@ const Scene: React.FC<SceneProps> = ({
           <EffectComposer>
             <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
             <DepthOfField focusDistance={0} focalLength={0.02} bokehScale={2} height={480} />
-            <SSR
-              intensity={0.45}
-              exponent={1}
-              distance={10}
-              fade={10}
-              roughnessFade={1}
-              thickness={10}
-              ior={0.45}
-              maxRoughness={1}
-              maxDepthDifference={10}
-              blend={0.95}
-              correction={1}
-              correctionRadius={1}
-              blur={0}
-              blurKernel={1}
-              blurSharpness={10}
-              jitter={0.75}
-              jitterRoughness={0.2}
-              steps={20}
-              refineSteps={5}
-              missedRays={false}
-              useNormalMap={true}
-              useRoughnessMap={true}
-              resolutionScale={1}
-              velocityResolutionScale={1}
-            />
           </EffectComposer>
         ) : null}
 
